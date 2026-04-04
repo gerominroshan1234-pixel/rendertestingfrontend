@@ -6,6 +6,8 @@ import './Popup.css';
  * A modern, styled popup/modal to replace ugly browser alerts
  */
 export default function Popup({ message, type = 'info', onClose, duration = 0 }) {
+    const isToast = type === 'info' && duration > 0;
+
     // Auto-close after duration if specified
     useEffect(() => {
         if (duration > 0) {
@@ -41,6 +43,16 @@ export default function Popup({ message, type = 'info', onClose, duration = 0 })
                 return 'popup-info';
         }
     };
+
+    if (isToast) {
+        return (
+            <div className="popup-toast-wrap">
+                <div className={`popup-toast ${getTypeClass()}`}>
+                    {message}
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="popup-overlay" onClick={onClose}>

@@ -25,6 +25,16 @@ export default function Login() {
 
     const strands = ["STEM", "ABM", "HUMSS", "GAS", "TVL"];
     const courses = ["BSIT", "BSCS", "BSBA", "BSCrim", "BSHM", "BSA", "BSED"];
+    const nonStudentReasons = [
+        'Parent/Guardian',
+        'Service Personnel',
+        'Visitor',
+        'Delivery Rider',
+        'Vendor/Supplier',
+        'Alumni',
+        'Event Participant',
+        'Other'
+    ];
 
     /**
      * Handle Enter key press for login form
@@ -45,18 +55,7 @@ export default function Login() {
     };
 
     const handleLogin = async () => {
-        // 1. ADMIN CHECK
-        if (loginRole === 'admin') {
-            if (username === 'admin' && password === 'admin123') {
-                localStorage.setItem('currentUser', JSON.stringify({ username: 'admin', role: 'admin' }));
-                navigate('/admin');
-            } else {
-                showError("Admin credentials incorrect.");
-            }
-            return;
-        }
-
-        // 2. DATABASE USER CHECK
+        // Unified login; destination depends on account role.
         try {
             const res = await axios.post('http://127.0.0.1:8000/api/login/', {
                 username: username.trim(),
@@ -69,10 +68,16 @@ export default function Login() {
                     role: res.data.user.role, 
                     firstName: res.data.user.first_name, 
                     lastName: res.data.user.last_name,
-                    identifier: res.data.user.identifier
+                    identifier: res.data.user.identifier,
+                    authToken: res.data.user.auth_token || ''
                 };
                 localStorage.setItem('currentUser', JSON.stringify(userSession));
-                navigate('/user');
+                const normalizedRole = (res.data.user.role || '').toLowerCase();
+                if (['root_admin', 'admin', 'guard'].includes(normalizedRole)) {
+                    navigate('/personnel');
+                } else {
+                    navigate('/user');
+                }
             }
         } catch (err) {
             const msg = err.response?.data?.message || "Login failed: Incorrect credentials.";
@@ -87,9 +92,13 @@ export default function Login() {
             return showError("Please fill in all required fields.");
         }
 
+        if (regRole !== 'student' && !guestPurpose) {
+            return showError("Please select a reason for Non-Student account.");
+        }
+
         let identifierText = regRole === 'student' 
             ? `${studentId} | ${level} - ${subLevel}` 
-            : (guestPurpose || "Guest");
+            : (guestPurpose || "Non-Student");
 
         const newUser = {
             firstName: fName,
@@ -125,8 +134,8 @@ export default function Login() {
                         <div className="panel">
                             <h3>Login As</h3>
                             <div className="role-tabs">
-                                <button className={`role-tab ${loginRole === 'user' ? 'active' : ''}`} onClick={() => setLoginRole('user')}>Student / Guest</button>
-                                <button className={`role-tab ${loginRole === 'admin' ? 'active' : ''}`} onClick={() => setLoginRole('admin')}>Admin</button>
+                                <button className={`role-tab ${loginRole === 'user' ? 'active' : ''}`} onClick={() => setLoginRole('user')}>Student / Non-Student</button>
+                                <button className={`role-tab ${loginRole === 'admin' ? 'active' : ''}`} onClick={() => setLoginRole('admin')}>Personnel</button>
                             </div>
                         </div>
 
@@ -158,7 +167,7 @@ export default function Login() {
                             <h3>Create Account</h3>
                             <div className="role-tabs">
                                 <button className={`role-tab ${regRole === 'student' ? 'active' : ''}`} onClick={() => setRegRole('student')}>Student</button>
-                                <button className={`role-tab ${regRole === 'guest' ? 'active' : ''}`} onClick={() => setRegRole('guest')}>Guest</button>
+                                <button className={`role-tab ${regRole === 'guest' ? 'active' : ''}`} onClick={() => setRegRole('guest')}>Non-Student</button>
                             </div>
 
                             <div className="action-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '15px' }}>
@@ -185,7 +194,12 @@ export default function Login() {
                                         )}
                                     </div>
                                 ) : (
-                                    <input type="text" placeholder="Purpose of Visit" value={guestPurpose} onChange={(e) => setGuestPurpose(e.target.value)} />
+                                    <select value={guestPurpose} onChange={(e) => setGuestPurpose(e.target.value)}>
+                                        <option value="">Select Reason</option>
+                                        {nonStudentReasons.map(reason => (
+                                            <option key={reason} value={reason}>{reason}</option>
+                                        ))}
+                                    </select>
                                 )}
                             </div>
 
