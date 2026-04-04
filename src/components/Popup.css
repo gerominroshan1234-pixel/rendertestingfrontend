@@ -27,7 +27,8 @@
 .popup-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
+    width: 100%;
     padding: 20px 20px 0 20px;
 }
 
@@ -126,6 +127,34 @@
 
 .popup-info .popup-icon {
     color: #2563eb;
+}
+
+/* Non-blocking toast for short info notifications */
+.popup-toast-wrap {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1100;
+    pointer-events: none;
+    animation: fadeIn 0.15s ease-out;
+}
+
+.popup-toast {
+    background: #ffffff;
+    color: #111827;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+    border: 1px solid #e5e7eb;
+    max-width: 300px;
+    text-align: center;
+}
+
+.popup-toast.popup-info {
+    background: #ffffff;
 }
 
 /* Animations */

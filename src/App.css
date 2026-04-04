@@ -36,13 +36,8 @@ body {
 }
 
 .dashboard-card {
-    max-width: 1200px !important;
-    width: 95%;
-}
-
-.dashboard-card {
-    max-width: 900px !important;
-    width: 95%;
+    max-width: 1540px !important;
+    width: min(98vw, 1540px);
 }
 
 .panel {
@@ -59,7 +54,7 @@ h2 {
     text-align: left;
     margin: 2px 0;
     font-size: 1.45rem;
-    color: #0f172a;
+    color: #000000;
     letter-spacing: 0.2px;
 }
 
