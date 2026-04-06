@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import CryptoJS from 'crypto-js';
 import { usePopup } from '../components/PopupContext';
+import { decryptDES } from '../utils/desCrypto';
 
 /**
  * AdminPanel Component
@@ -149,15 +149,8 @@ export default function AdminPanel() {
         return application ? decryptData(application.plate_number) : null;
     };
 
-    /**
-     * Decrypt DES-encrypted data using the application secret key.
-     */
-    const decryptData = (ciphertext) => {
-        try {
-            const bytes = CryptoJS.DES.decrypt(ciphertext, 'UA-SECRET-KEY');
-            return bytes.toString(CryptoJS.enc.Utf8) || ciphertext;
-        } catch (e) { return ciphertext; }
-    };
+    // Local alias used by existing table/render code.
+    const decryptData = (ciphertext) => decryptDES(ciphertext);
 
     /**
      * Fetch all vehicle applications from the backend.
