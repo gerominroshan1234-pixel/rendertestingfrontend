@@ -570,6 +570,7 @@ export default function ParkingManagement({
 
                 const response = await axios.post('http://127.0.0.1:8000/api/submit-reservation/', {
                     username: user.username,
+                    auth_token: user.authToken || JSON.parse(localStorage.getItem('currentUser') || 'null')?.authToken || '',
                     sticker_id: sticker,
                     reservation_category: reservationCategoryPayload,
                     reserved_spots: Array.from(selectedSpotsForReservation),

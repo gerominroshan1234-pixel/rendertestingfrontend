@@ -178,11 +178,15 @@ export default function AdminPanel() {
     const getPlateFromSticker = (stickerId) => {
         if (!records || records.length === 0) return null;
         const normalizedStickerId = (stickerId || '').trim().toUpperCase();
-        const application = records.find(r =>
+        const matches = records.filter(r =>
             isStickerValidForCurrentSemester(r) &&
             (r.sticker_id || '').trim().toUpperCase() === normalizedStickerId
         );
-        return application ? decryptData(application.plate_number) : null;
+        if (matches.length === 0) return null;
+
+        // Prefer the most recent approved record in case of historical duplicate sticker IDs.
+        const sortedMatches = matches.slice().sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0));
+        return decryptData(sortedMatches[0].plate_number);
     };
 
     // Local alias used by existing table/render code.
@@ -429,7 +433,9 @@ export default function AdminPanel() {
                 auth_token: currentUser.authToken || ''
             });
             fetchData();
-        } catch (err) { showError("Update failed"); }
+        } catch (err) {
+            showError(err?.response?.data?.message || 'Update failed');
+        }
     };
 
     // Sticker verification handlers
@@ -475,7 +481,7 @@ export default function AdminPanel() {
             eventType,
             slotId: slot.id,
             plateNumber: slot.plateNumber || '',
-            stickerId: slot.stickerId || slot.reservedStickerId || '',
+            stickerId: slot.stickerId || '',
             actor: currentUser.username || 'personnel',
             notes
         };

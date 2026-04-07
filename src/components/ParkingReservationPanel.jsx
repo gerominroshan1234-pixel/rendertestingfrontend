@@ -81,6 +81,16 @@ export default function ParkingReservationPanel({
                             </thead>
                             <tbody>
                                 {paginatedUserReservations.map((res) => {
+                                    const normalizedSpots = Array.isArray(res.reserved_spots)
+                                        ? res.reserved_spots
+                                        : (() => {
+                                            try {
+                                                return JSON.parse(res.reserved_spots || '[]');
+                                            } catch {
+                                                return [];
+                                            }
+                                        })();
+
                                     const statusColor =
                                         res.status === 'approved' ? '#10b981' :
                                         res.status === 'denied' ? '#ef4444' :
@@ -95,9 +105,7 @@ export default function ParkingReservationPanel({
                                     return (
                                         <tr key={res.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
                                             <td style={{ padding: '10px', fontWeight: 600 }}>
-                                                {Array.isArray(res.reserved_spots)
-                                                    ? res.reserved_spots.join(', ')
-                                                    : JSON.parse(res.reserved_spots || '[]').join(', ')}
+                                                {normalizedSpots.join(', ')}
                                             </td>
                                             <td style={{ padding: '10px', fontSize: '12px' }}>{res.reservation_reason}</td>
                                             <td style={{ padding: '10px', fontSize: '12px' }}>

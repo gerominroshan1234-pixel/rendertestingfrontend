@@ -334,7 +334,13 @@ export default function UserDashboard() {
      */
     const fetchUserRecords = async (username) => {
         try {
-            const res = await axios.get(`http://127.0.0.1:8000/api/user-records/?username=${username}`);
+            const authToken = user?.authToken || JSON.parse(localStorage.getItem('currentUser') || 'null')?.authToken || '';
+            const res = await axios.get('http://127.0.0.1:8000/api/user-records/', {
+                params: {
+                    username,
+                    auth_token: authToken
+                }
+            });
             setRecords(res.data);
         } catch (err) {
             console.error("User fetch error:", err);
@@ -346,7 +352,13 @@ export default function UserDashboard() {
      */
     const fetchUserReservations = async (username) => {
         try {
-            const res = await axios.get(`http://127.0.0.1:8000/api/user-reservations/?username=${username}`);
+            const authToken = user?.authToken || JSON.parse(localStorage.getItem('currentUser') || 'null')?.authToken || '';
+            const res = await axios.get('http://127.0.0.1:8000/api/user-reservations/', {
+                params: {
+                    username,
+                    auth_token: authToken
+                }
+            });
             setUserReservations(res.data);
         } catch (err) {
             console.error("Reservations fetch error:", err);
@@ -914,7 +926,8 @@ export default function UserDashboard() {
         const unreadReservationKeys = unreadReservationStatusNotifs.map((notif) => notif.key);
         try {
             await axios.post('http://127.0.0.1:8000/api/mark-notifications-read/', {
-                username: user.username
+                username: user.username,
+                auth_token: user.authToken || ''
             });
             fetchUserRecords(user.username);
         } catch (err) {
@@ -966,6 +979,7 @@ export default function UserDashboard() {
             const updateData = {
                 username: user.username,
                 identifier: newIdentifier,
+                auth_token: user.authToken || ''
             };
             
             if (wantsPasswordChange) {
@@ -993,17 +1007,21 @@ export default function UserDashboard() {
 
     // 4. Submit Application
     const submitApp = async () => {
-        if (!plate) return showError("Please enter Plate Number.");
+        const rawPlate = (plate || '').trim();
+        if (!rawPlate) return showError("Please enter Plate Number.");
+        if (/[a-z]/.test(rawPlate)) return showError('Uppercase only: please enter your plate number in uppercase letters.');
+        const normalizedPlate = rawPlate.toUpperCase();
         if (!paymentMethod) return showError("Please select payment method.");
         if (!paymentReference.trim()) return showError("Please enter payment reference number.");
 
         const displayFullName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username;
-        const encPlate = encryptDES(plate);
+        const encPlate = encryptDES(normalizedPlate);
         const encOwner = encryptDES(displayFullName);
         
         try {
             await axios.post('http://127.0.0.1:8000/api/submit-vehicle/', {
                 username: user.username,
+                auth_token: user.authToken || '',
                 ownerName: encOwner,
                 plateNumber: encPlate,
                 vehicleType: type,
@@ -1023,8 +1041,13 @@ export default function UserDashboard() {
 
     const handleProceedToPayment = (e) => {
         e.preventDefault();
-        if (!plate.trim()) {
+        const rawPlate = (plate || '').trim();
+        if (!rawPlate) {
             showError('Please enter Plate Number before proceeding to payment.');
+            return;
+        }
+        if (/[a-z]/.test(rawPlate)) {
+            showError('Uppercase only: please enter your plate number in uppercase letters.');
             return;
         }
         setShowPaymentModal(true);

@@ -67,9 +67,14 @@ export default function StickerManagement({
     // e.preventDefault() blocks the browser's default form reload behavior
     const handleProceedToPayment = (e) => {
         e.preventDefault();
+        const rawPlate = (plate || '').trim();
         // Guard clause: plate is required before proceeding
-        if (!plate.trim()) {
+        if (!rawPlate) {
             showError('Please enter Plate Number before proceeding to payment.');
+            return;
+        }
+        if (/[a-z]/.test(rawPlate)) {
+            showError('Uppercase only: please enter your plate number in uppercase letters.');
             return;
         }
         // If valid, show the payment modal overlay
@@ -99,14 +104,17 @@ export default function StickerManagement({
         // ============ VALIDATION PHASE ============
         // Check all required fields before attempting encryption/network call
         // Early return pattern: fail fast with user feedback, avoiding wasted computation
-        if (!plate) return showError("Please enter Plate Number.");
+        const rawPlate = (plate || '').trim();
+        if (!rawPlate) return showError("Please enter Plate Number.");
+        if (/[a-z]/.test(rawPlate)) return showError('Uppercase only: please enter your plate number in uppercase letters.');
+        const normalizedPlate = rawPlate.toUpperCase();
         if (!paymentMethod) return showError("Please select payment method.");
         if (!paymentReference.trim()) return showError("Please enter payment reference number.");
 
         // ============ ENCRYPTION PHASE ============
         // Encrypt sensitive data using DES algorithm (from desCrypto.js utility)
         // encryptDES uses a hardcoded key shared between frontend and backend
-        const encPlate = encryptDES(plate); // Example: \"ABC1234\" → \"$sDf#1@8\"
+        const encPlate = encryptDES(normalizedPlate); // Example: "ABC1234" → "$sDf#1@8"
         const encOwner = encryptDES(displayFullName); // Example: \"John Doe\" → \"kX9$mL2#\"
         
         try {
@@ -115,6 +123,7 @@ export default function StickerManagement({
             // Backend will: 1) Store encrypted values in database,  2) Auto-decrypt using same key for display
             await axios.post('http://127.0.0.1:8000/api/submit-vehicle/', {
                 username: user.username, // Current user's username (not encrypted, used to link application to user)
+                auth_token: user.authToken || JSON.parse(localStorage.getItem('currentUser') || 'null')?.authToken || '',
                 ownerName: encOwner, // ENCRYPTED full name of vehicle owner
                 plateNumber: encPlate, // ENCRYPTED vehicle plate number
                 vehicleType: type, // Not encrypted: \"2-Wheels\", \"4-Wheels\", or \"Service\"
