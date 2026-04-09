@@ -335,7 +335,7 @@ export default function UserDashboard() {
     const fetchUserRecords = async (username) => {
         try {
             const authToken = user?.authToken || JSON.parse(localStorage.getItem('currentUser') || 'null')?.authToken || '';
-            const res = await axios.get(`${import.meta.env.VITE_API_URL || \'http://127.0.0.1:8000\'}/api/user-records/`, {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/user-records/`, {
                 params: {
                     username,
                     auth_token: authToken
@@ -353,7 +353,7 @@ export default function UserDashboard() {
     const fetchUserReservations = async (username) => {
         try {
             const authToken = user?.authToken || JSON.parse(localStorage.getItem('currentUser') || 'null')?.authToken || '';
-            const res = await axios.get(`${import.meta.env.VITE_API_URL || \'http://127.0.0.1:8000\'}/api/user-reservations/`, {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/user-reservations/`, {
                 params: {
                     username,
                     auth_token: authToken
@@ -606,7 +606,7 @@ export default function UserDashboard() {
 
         if (matchingReservation) {
             try {
-                await axios.post(`${import.meta.env.VITE_API_URL || \'http://127.0.0.1:8000\'}/api/update-reservation-admin/`, {
+                await axios.post(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/update-reservation-admin/`, {
                     reservation_id: matchingReservation.id,
                     status: 'cancelled',
                     admin_notes: 'Released due to no-show',
@@ -971,7 +971,7 @@ export default function UserDashboard() {
     const markAsRead = async () => {
         const unreadReservationKeys = unreadReservationStatusNotifs.map((notif) => notif.key);
         try {
-            await axios.post(`${import.meta.env.VITE_API_URL || \'http://127.0.0.1:8000\'}/api/mark-notifications-read/`, {
+            await axios.post(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/mark-notifications-read/`, {
                 username: user.username,
                 auth_token: user.authToken || ''
             });
@@ -1033,7 +1033,7 @@ export default function UserDashboard() {
                 updateData.password = newPassword.trim();
             }
 
-            await axios.post(`${import.meta.env.VITE_API_URL || \'http://127.0.0.1:8000\'}/api/update-profile/`, updateData);
+            await axios.post(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/update-profile/`, updateData);
             
             if (wantsPasswordChange) {
                 showSuccess("Password changed! Please log in again.");
@@ -1065,7 +1065,7 @@ export default function UserDashboard() {
         const encOwner = encryptDES(displayFullName);
         
         try {
-            await axios.post(`${import.meta.env.VITE_API_URL || \'http://127.0.0.1:8000\'}/api/submit-vehicle/`, {
+            await axios.post(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/submit-vehicle/`, {
                 username: user.username,
                 auth_token: user.authToken || '',
                 ownerName: encOwner,

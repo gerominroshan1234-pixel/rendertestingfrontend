@@ -121,7 +121,7 @@ export default function StickerManagement({
             // ============ SUBMISSION PHASE ============
             // POST to backend with encrypted plate and owner, plus other metadata
             // Backend will: 1) Store encrypted values in database,  2) Auto-decrypt using same key for display
-            await axios.post(`${import.meta.env.VITE_API_URL || \'http://127.0.0.1:8000\'}/api/submit-vehicle/`, {
+            await axios.post(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/submit-vehicle/`, {
                 username: user.username, // Current user's username (not encrypted, used to link application to user)
                 auth_token: user.authToken || JSON.parse(localStorage.getItem('currentUser') || 'null')?.authToken || '',
                 ownerName: encOwner, // ENCRYPTED full name of vehicle owner

@@ -198,7 +198,7 @@ export default function AdminPanel() {
      */
     const fetchData = async () => {
         try {
-            const res = await axios.get(`${import.meta.env.VITE_API_URL || \'http://127.0.0.1:8000\'}/api/admin-records/`, {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/admin-records/`, {
                 params: {
                     requester_username: currentUser.username,
                     auth_token: currentUser.authToken || ''
@@ -223,7 +223,7 @@ export default function AdminPanel() {
      */
     const fetchPendingReservations = async () => {
         try {
-            const res = await axios.get(`${import.meta.env.VITE_API_URL || \'http://127.0.0.1:8000\'}/api/all-reservations/`, {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/all-reservations/`, {
                 params: {
                     requester_username: currentUser.username,
                     auth_token: currentUser.authToken || ''
@@ -324,7 +324,7 @@ export default function AdminPanel() {
                 auth_token: currentUser.authToken || ''
             };
 
-            const response = await axios.post(`${import.meta.env.VITE_API_URL || \'http://127.0.0.1:8000\'}/api/update-reservation-admin/`, payload);
+            const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/update-reservation-admin/`, payload);
             if (response.data.status === 'success') {
                 applyReservationToSlots(reservation, payload.status);
                 showInfo('Reservation updated successfully');
@@ -426,7 +426,7 @@ export default function AdminPanel() {
      */
     const handleUpdateStatus = async (id, status) => {
         try {
-            await axios.post(`${import.meta.env.VITE_API_URL || \'http://127.0.0.1:8000\'}/api/update-status/`, {
+            await axios.post(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/update-status/`, {
                 id,
                 status,
                 requester_username: currentUser.username,
@@ -569,7 +569,7 @@ export default function AdminPanel() {
         if (matchingReservation) {
             try {
                 // 2. Formally cancel via backend
-                await axios.post(`${import.meta.env.VITE_API_URL || \'http://127.0.0.1:8000\'}/api/update-reservation-admin/`, {
+                await axios.post(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/update-reservation-admin/`, {
                     reservation_id: matchingReservation.id,
                     status: 'cancelled',
                     admin_notes: 'Released by personnel due to no-show',
@@ -706,7 +706,7 @@ export default function AdminPanel() {
         }
 
         try {
-            const response = await axios.post(`${import.meta.env.VITE_API_URL || \'http://127.0.0.1:8000\'}/api/create-personnel-account/`, {
+            const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/create-personnel-account/`, {
                 requester_username: currentUser.username,
                 role: personnelRole,
                 first_name: personnelFirstName.trim(),

@@ -89,7 +89,7 @@ export default function Login() {
         // Unified login endpoint; backend decides if credentials are valid.
         try {
             // Trim values to avoid accidental spaces causing failed login attempts.
-            const res = await axios.post(`${import.meta.env.VITE_API_URL || \'http://127.0.0.1:8000\'}/api/login/`, {
+            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/login/`, {
                 username: username.trim(),
                 password: password.trim() // Plain text sent over local/dev HTTP API.
             });
@@ -168,7 +168,7 @@ export default function Login() {
 
         try {
             // Create user account in backend.
-            const res = await axios.post(`${import.meta.env.VITE_API_URL || \'http://127.0.0.1:8000\'}/api/register/`, newUser);
+            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/register/`, newUser);
             if (res.data.status === 'success') {
                 showSuccess("Account created successfully! You can now Login.");
 
